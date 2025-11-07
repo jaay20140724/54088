@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智点课堂 - 随机点名与答题记录系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --accent: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --warning: #f39c12;
+            --gray: #95a5a6;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 0.5s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--warning), var(--accent));
+        }
+        
+        h1 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 2.8rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 25%;
+            width: 50%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            border-radius: 2px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.3rem;
+            font-weight: 300;
+        }
+        
+        .developer-info {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border-left: 5px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .developer-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        .developer-info i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        
+        .developer-text {
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .developer-divider {
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            margin: 5px 0;
+        }
+        
+        .section-divider {
+            display: flex;
+            align-items: center;
+            margin: 40px 0;
+            color: var(--dark);
+        }
+        
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+        
+        .section-divider i {
+            margin: 0 20px;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .section {
+            margin: 40px 0;
+            padding: 35px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        
+        .section-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .section-description {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: left;
+            padding: 0 15px;
+        }
+        
+        .section-content {
+            padding: 0 15px;
+        }
+        
+        textarea {
+            width: 90%;
+            padding: 18px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: vertical;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+        
+        button {
+            margin: 12px;
+            padding: 16px 28px;
+            font-size: 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .primary-btn {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+        }
+        
+        .success-btn {
+            background: linear-gradient(135deg, var(--secondary), #27ae60);
+            color: white;
+        }
+        
+        .warning-btn {
+            background: linear-gradient(135deg, var(--warning), #e67e22);
+            color: white;
+        }
+        
+        .accent-btn {
+            background: linear-gradient(135deg, var(--accent), #c0392b);
+            color: white;
+        }
+        
+        .secondary-btn {
+            background: linear-gradient(135deg, var(--gray), #7f8c8d);
+            color: white;
+        }
+        
+        .score-btn-3 {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .score-btn-2 {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .score-btn-1 {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        button:active {
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+        }
+        
+        #result {
+            font-size: 36px;
+            margin: 30px 0;
+            padding: 30px;
+            border-radius: 18px;
+            background: white;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px dashed var(--primary);
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+        }
+        
+        .rolling {
+            animation: rolling 0.15s infinite;
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        @keyframes rolling {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        th {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e8f4fc;
+        }
+        
+        .stats-cards {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            width: 30%;
+            min-width: 180px;
+            margin: 10px;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-top: 15px;
+        }
+        
+        .format-hint {
+            font-size: 15px;
+            color: #7f8c8d;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .highlight {
+            background-color: #fff9c4;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .bg-upload {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .score-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            gap: 15px;
+        }
+        
+        .score-buttons button {
+            font-size: 18px;
+            padding: 18px 25px;
+            min-width: 120px;
+            flex: 1;
+            max-width: 180px;
+        }
+        
+        .file-upload-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 15px 0;
+        }
+        
+        .file-upload-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-upload-label {
+            display: inline-block;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .file-upload-label:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .student-count {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .feature-list {
+            text-align: left;
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+        
+        .feature-list li {
+            margin: 12px 0;
+            line-height: 1.6;
+        }
+        
+        /* 新增样式：积分修改按钮 */
+        .edit-score-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin: 0 5px;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .edit-score-btn:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: scale(1.2);
+        }
+        
+        /* 新增样式：积分排名 */
+        .ranking-section {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .ranking-table th, .ranking-table td {
+            border: 1px solid #e0e0e0;
+            padding: 16px;
+            text-align: center;
+            font-size: 1rem;
+        }
+        
+        .ranking-table th {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .ranking-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .ranking-table tr:hover {
+            background-color: #e8f4fc;
+        }
+        
+        .ranking-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .rank-1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+        }
+        
+        .rank-2 {
+            background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+        }
+        
+        .rank-3 {
+            background: linear-gradient(135deg, #CD7F32, #A56A2B);
+        }
+        
+        .rank-other {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .medal-icon {
+            font-size: 1.1rem;
+            margin-right: 3px;
+        }
+        
+        .ranking-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .ranking-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+        }
+        
+        .ranking-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .ranking-description {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: left;
+            padding: 0 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 15px auto;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .stats-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat-card {
+                width: 90%;
+            }
+            
+            .score-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .score-buttons button {
+                max-width: 100%;
+                width: 90%;
+            }
+            
+            .developer-item {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>智点课堂</h1>
+        <p class="subtitle">大模型辅助编程实现随机点名与答题记录系统</p>
+        
+        <!-- 修改开发者信息，新增一人 -->
+        <div class="developer-info">
+            <div class="developer-item">
+                <i class="fas fa-user-graduate"></i>
+                <div class="developer-text">
+                    <p><strong>开发者：杨晓燕</strong> | <strong>学校：龙岗区科技城外国语学校</strong> | <strong>联系电话：15013414711</strong></p>
+                </div>
+            </div>
+            <div class="developer-divider"></div>
+            <div class="developer-item">
+                <i class="fas fa-user-graduate"></i>
+                <div class="developer-text">
+                    <p><strong>开发者：文杰</strong> | <strong>学校：龙岗区科技城外国语学校</strong> | <strong>联系电话：18617054166</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h2 class="section-title">个性化背景设置</h2>
+            </div>
+            <p class="section-description">
+                上传您喜欢的图片作为课堂背景，营造独特的教学氛围。支持JPG、PNG等常见图片格式，上传后背景将自动应用。
+            </p>
+            <div class="section-content">
+                <div class="bg-upload">
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="bgUpload" accept="image/*">
+                        <div class="file-upload-label">
+                            <i class="fas fa-upload"></i> 选择背景图片
+                        </div>
+                    </div>
+                    <button class="secondary-btn" onclick="resetBackground()">
+                        <i class="fas fa-sync-alt"></i> 恢复默认背景
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h2 class="section-title">学生名单管理</h2>
+            </div>
+            <p class="section-description">
+                导入课堂学生名单，系统支持多种分隔符格式，方便您快速录入。名单导入后将在整个课堂环节中使用。
+            </p>
+            <div class="section-content">
+                <label for="students">输入学生姓名：</label><br>
+                <textarea id="students" rows="5" placeholder="例如：
+小明、小红、小刚
+小华，小丽
+小王 小李"></textarea>
+                <p class="format-hint">支持的分隔符：<span class="highlight">换行</span>、<span class="highlight">顿号（、）</span>、<span class="highlight">中文逗号（，）</span>、<span class="highlight">英文逗号（,）</span>、<span class="highlight">空格</span></p>
+                <button class="primary-btn" onclick="addStudents()">
+                    <i class="fas fa-user-plus"></i> 导入学生名单
+                </button>
+                <div class="student-count" id="studentCount">当前名单：0 名学生</div>
+            </div>
+        </div>
+
+        <div class="section-divider">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-random"></i>
+                </div>
+                <h2 class="section-title">课堂随机点名</h2>
+            </div>
+            <p class="section-description">
+                使用随机点名功能增加课堂互动性和趣味性。点击"开始点名"按钮，系统将随机滚动显示学生姓名，点击"停止点名"确定最终人选。
+            </p>
+            <div class="section-content">
+                <button class="primary-btn" id="startBtn" onclick="startRolling()">
+                    <i class="fas fa-play"></i> 开始点名
+                </button>
+                <button class="accent-btn" id="stopBtn" onclick="stopRolling()" disabled>
+                    <i class="fas fa-stop"></i> 停止点名
+                </button>
+                
+                <div id="result">等待点名...</div>
+            </div>
+        </div>
+
+        <div class="section-divider">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h2 class="section-title">课堂表现评分</h2>
+            </div>
+            <p class="section-description">
+                根据学生答题表现给予相应分数，系统将自动记录并统计。您可以根据回答质量给予3分、2分或1分，未回答问题记录为0分。
+            </p>
+            <div class="section-content">
+                <div class="score-buttons">
+                    <button class="score-btn-3" onclick="recordScore(3)">
+                        <i class="fas fa-crown"></i> 加3分
+                    </button>
+                    <button class="score-btn-2" onclick="recordScore(2)">
+                        <i class="fas fa-star"></i> 加2分
+                    </button>
+                    <button class="score-btn-1" onclick="recordScore(1)">
+                        <i class="fas fa-check-circle"></i> 加1分
+                    </button>
+                    <button class="secondary-btn" onclick="recordScore(0)">
+                        <i class="fas fa-minus-circle"></i> 未答
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h2 class="section-title">课堂记录与统计</h2>
+            </div>
+            <p class="section-description">
+                系统自动记录每次点名的学生及其得分情况，并生成实时统计信息。您可以随时修改积分、导出记录用于课后分析或成绩统计。
+            </p>
+            <div class="section-content">
+                <!-- 2. 添加积分修改按钮 -->
+                <table id="recordTable">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>姓名</th>
+                            <th>得分</th>
+                            <th>时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordBody"></tbody>
+                </table>
+                <button class="primary-btn" onclick="exportToCSV()">
+                    <i class="fas fa-file-export"></i> 导出记录（CSV）
+                </button>
+                <button class="secondary-btn" onclick="clearRecords()">
+                    <i class="fas fa-trash-alt"></i> 清空记录
+                </button>
+            </div>
+        </div>
+
+        <div class="section-divider">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h2 class="section-title">课堂数据统计</h2>
+            </div>
+            <p class="section-description">
+                实时统计课堂互动数据，按照学生积分进行排名，帮助您了解学生参与情况和整体表现。数据包括总答题次数、总得分和平均得分。
+            </p>
+            <div class="section-content">
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <p><i class="fas fa-list-ol"></i> 总答题次数</p>
+                        <p class="stat-value" id="totalCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <p><i class="fas fa-star"></i> 总得分</p>
+                        <p class="stat-value" id="totalScore">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <p><i class="fas fa-calculator"></i> 平均得分</p>
+                        <p class="stat-value" id="averageScore">0</p>
+                    </div>
+                </div>
+                
+                <!-- 3. 新增积分排名 -->
+                <div class="ranking-section">
+                    <div class="ranking-header">
+                        <div class="ranking-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3 class="ranking-title">学生积分排行榜</h3>
+                    </div>
+                    
+                    <p class="ranking-description">
+                        根据学生课堂表现积分进行排名，积分相同的学生并列排名。排名前三的学生将获得特殊标识。
+                    </p>
+                    
+                    <table class="ranking-table" id="rankingTable">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>姓名</th>
+                                <th>总积分</th>
+                                <th>答题次数</th>
+                                <th>平均分</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingBody">
+                            <tr>
+                                <td colspan="5" style="padding: 30px; color: #7f8c8d;">
+                                    <i class="fas fa-info-circle"></i> 暂无排名数据，请先进行课堂点名和评分
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let studentList = [];
+        let records = [];
+        let currentStudent = '';
+        let isRolling = false;
+        let rollInterval;
+
+        // 背景图片上传功能
+        document.getElementById('bgUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.body.style.backgroundImage = `url(${event.target.result})`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function resetBackground() {
+            document.body.style.backgroundImage = '';
+            document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        }
+
+        function addStudents() {
+            const input = document.getElementById('students').value.trim();
+            if (!input) {
+                alert('请输入学生名单！');
+                return;
+            }
+            
+            // 支持多种分隔符：换行、顿号、中文逗号、英文逗号、空格
+            const separators = /\n|、|，|,| /;
+            studentList = input.split(separators)
+                .map(name => name.trim())
+                .filter(name => name);
+                
+            if (studentList.length === 0) {
+                alert('未检测到有效的学生姓名，请检查输入格式！');
+                return;
+            }
+            
+            document.getElementById('studentCount').innerText = `当前名单：${studentList.length} 名学生`;
+            alert(`成功导入 ${studentList.length} 名学生！`);
+        }
+
+        function startRolling() {
+            if (studentList.length === 0) {
+                alert('请先导入学生名单！');
+                return;
+            }
+            
+            isRolling = true;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('result').classList.add('rolling');
+            
+            rollInterval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * studentList.length);
+                currentStudent = studentList[randomIndex];
+                document.getElementById('result').innerHTML = `<span style="color:#e74c3c;">${currentStudent}</span>`;
+            }, 100);
+        }
+
+        function stopRolling() {
+            if (!isRolling) return;
+            
+            clearInterval(rollInterval);
+            isRolling = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('result').classList.remove('rolling');
+            
+            if (currentStudent) {
+                document.getElementById('result').innerHTML = `<span style="color:#e74c3c; font-size:42px;">🎉 ${currentStudent} 🎉</span>`;
+            }
+        }
+
+        function recordScore(score) {
+            if (!currentStudent) {
+                alert('请先进行点名！');
+                return;
+            }
+            
+            const time = new Date().toLocaleString();
+            let scoreText = '';
+            
+            if (score === 0) {
+                scoreText = '未答';
+            } else {
+                scoreText = `+${score}分`;
+            }
+            
+            records.push({ 
+                name: currentStudent, 
+                score: score,
+                scoreText: scoreText,
+                time: time
+            });
+            
+            updateRecordTable();
+            updateStatistics();
+            currentStudent = '';
+            document.getElementById('result').innerHTML = '等待点名...';
+        }
+
+        // 修改积分功能
+        function editScore(index) {
+            const record = records[index];
+            const newScore = prompt(`修改 ${record.name} 的积分 (当前: ${record.score}分):`, record.score);
+            
+            if (newScore !== null && !isNaN(newScore) && newScore.trim() !== '') {
+                const scoreValue = parseInt(newScore);
+                if (scoreValue >= 0) {
+                    records[index].score = scoreValue;
+                    records[index].scoreText = scoreValue === 0 ? '未答' : `+${scoreValue}分`;
+                    updateRecordTable();
+                    updateStatistics();
+                } else {
+                    alert('请输入有效的积分值（大于等于0）');
+                }
+            }
+        }
+
+        // 删除记录功能
+        function deleteRecord(index) {
+            if (confirm('确定要删除这条记录吗？')) {
+                records.splice(index, 1);
+                updateRecordTable();
+                updateStatistics();
+            }
+        }
+
+        function updateRecordTable() {
+            const tbody = document.getElementById('recordBody');
+            tbody.innerHTML = '';
+            records.forEach((record, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${record.name}</td>
+                    <td>${record.scoreText}</td>
+                    <td>${record.time}</td>
+                    <td>
+                        <button class="edit-score-btn" onclick="editScore(${index})" title="修改积分">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="edit-score-btn" onclick="deleteRecord(${index})" title="删除记录" style="color: var(--accent);">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 计算并更新学生积分排名（修复并列排名问题）
+        function updateRanking() {
+            if (records.length === 0) {
+                document.getElementById('rankingBody').innerHTML = `
+                    <tr>
+                        <td colspan="5" style="padding: 30px; color: #7f8c8d;">
+                            <i class="fas fa-info-circle"></i> 暂无排名数据，请先进行课堂点名和评分
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // 计算每个学生的总积分和答题次数
+            const studentStats = {};
+            
+            records.forEach(record => {
+                if (!studentStats[record.name]) {
+                    studentStats[record.name] = {
+                        totalScore: 0,
+                        count: 0
+                    };
+                }
+                studentStats[record.name].totalScore += record.score;
+                studentStats[record.name].count += 1;
+            });
+            
+            // 转换为数组并按照总积分排序
+            const ranking = Object.keys(studentStats).map(name => {
+                const stats = studentStats[name];
+                return {
+                    name: name,
+                    totalScore: stats.totalScore,
+                    count: stats.count,
+                    average: (stats.totalScore / stats.count).toFixed(1)
+                };
+            }).sort((a, b) => b.totalScore - a.totalScore);
+            
+            // 计算实际排名（正确处理并列情况）
+            const rankedStudents = [];
+            let currentRank = 1;
+            let previousScore = null;
+            let sameRankCount = 0;
+            
+            for (let i = 0; i < ranking.length; i++) {
+                const student = ranking[i];
+                
+                if (previousScore === null) {
+                    // 第一个学生
+                    student.rank = currentRank;
+                } else if (student.totalScore === previousScore) {
+                    // 与前一个学生积分相同，并列排名
+                    student.rank = currentRank;
+                    sameRankCount++;
+                } else {
+                    // 积分不同，更新排名
+                    currentRank = currentRank + sameRankCount + 1;
+                    student.rank = currentRank;
+                    sameRankCount = 0;
+                }
+                
+                previousScore = student.totalScore;
+                rankedStudents.push(student);
+            }
+            
+            // 更新排名表格
+            const tbody = document.getElementById('rankingBody');
+            tbody.innerHTML = '';
+            
+            rankedStudents.forEach((student) => {
+                const row = document.createElement('tr');
+                
+                // 确定排名样式
+                let rankClass = 'rank-other';
+                let rankIcon = '';
+                
+                if (student.rank === 1) {
+                    rankClass = 'rank-1';
+                    rankIcon = '<i class="fas fa-crown medal-icon"></i>';
+                } else if (student.rank === 2) {
+                    rankClass = 'rank-2';
+                    rankIcon = '<i class="fas fa-medal medal-icon"></i>';
+                } else if (student.rank === 3) {
+                    rankClass = 'rank-3';
+                    rankIcon = '<i class="fas fa-medal medal-icon"></i>';
+                }
+                
+                row.innerHTML = `
+                    <td>
+                        <span class="ranking-badge ${rankClass}">
+                            ${rankIcon}${student.rank}
+                        </span>
+                    </td>
+                    <td><strong>${student.name}</strong></td>
+                    <td style="font-weight: bold; color: #e74c3c;">${student.totalScore}分</td>
+                    <td>${student.count}次</td>
+                    <td>${student.average}分</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateStatistics() {
+            const total = records.length;
+            const totalScore = records.reduce((sum, record) => sum + record.score, 0);
+            const averageScore = total > 0 ? (totalScore / total).toFixed(1) : 0;
+            
+            document.getElementById('totalCount').innerText = total;
+            document.getElementById('totalScore').innerText = totalScore;
+            document.getElementById('averageScore').innerText = averageScore;
+            
+            // 更新排名
+            updateRanking();
+        }
+
+        function exportToCSV() {
+            if (records.length === 0) {
+                alert('暂无记录可导出！');
+                return;
+            }
+            let csv = "序号,姓名,得分,时间\n";
+            records.forEach((record, index) => {
+                csv += `${index + 1},"${record.name}","${record.scoreText}","${record.time}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `课堂答题记录_${new Date().toLocaleDateString()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function clearRecords() {
+            if (confirm('确定要清空所有答题记录吗？此操作不可撤销。')) {
+                records = [];
+                updateRecordTable();
+                updateStatistics();
+            }
+        }
+    </script>
+</body>
+</html>
